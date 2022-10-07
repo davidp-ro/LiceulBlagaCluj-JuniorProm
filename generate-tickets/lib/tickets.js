@@ -29,13 +29,19 @@ const Tickets = {
   
       console.log(`Generating ticket ${currentCount} of ${initalCount} (${code})`);
   
-      const dbRes = await supabase.addTicketToDb(
-        code,
-        "student+generic",
-        5,
-        "2022-10-30T12:00:00.000"
-      );
+      // TODO: Uncomment this!
+      // const dbRes = await supabase.addTicketToDb(
+      //   code,
+      //   "student+generic",
+      //   5,
+      //   "2022-10-30T12:00:00.000"
+      // );
   
+      let dbRes = {
+        status: "ok",
+        raw: null,
+      }
+
       if (dbRes.status === "fail_duplicate") {
         console.log("Duplicate code, retrying");
         continue;
@@ -46,9 +52,19 @@ const Tickets = {
         await Barcode.generateTicket(
           code,
           `out/tickets_${page}.png`,
-          2480 / 2 - 462 / 2, // x coord
-          y, // y coord
+          110, // x coord
+          (initalCount - currentPerPage - 1) * 688 + 840, // y coord
+          // (initalCount - currentPerPage + 1) * 172, // y coord
+          "R"
         )
+
+        // For testing:
+        // await Barcode.generateTicket(
+        //   code,
+        //   `out/tickets_${page}.png`,
+        //   2480 / 2 - 462 / 2, // x coord
+        //   y, // y coord
+        // )
   
         ++currentPerPage;
         if (currentPerPage >= maxPerPage) {

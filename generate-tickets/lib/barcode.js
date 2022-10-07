@@ -17,8 +17,9 @@ const Barcode = {
    * @param {string} pageFile Path to the page file
    * @param {number} x X coordiante of the barcode
    * @param {number} y Y coordinate of the barcode
+   * @param {"R" | "N" | "L" | "I" | undefined} rotation Rotation of the barcode
    */
-  async generateTicket(code, pageFile, x, y) {
+  async generateTicket(code, pageFile, x, y, rotation) {
     const codeImgBinary = await bwipjs.toBuffer({
       bcid: "code128",
       text: code,
@@ -29,6 +30,7 @@ const Barcode = {
       paddingheight: 5,
       paddingwidth: 10,
       textyoffset: 2,
+      rotate: rotation,
     });
   
     fs.writeFileSync(this.TEMP_IMG_FILENAME, codeImgBinary, "binary");
