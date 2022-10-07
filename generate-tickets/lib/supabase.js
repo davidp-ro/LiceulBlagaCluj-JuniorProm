@@ -24,7 +24,7 @@ class Supabase {
    * @param {string} code The barcode
    * @param {string} type The type of ticket
    * @param {number} initialEntries The number of entries the ticket has
-   * @param {Date} exp The expiration date
+   * @param {string} exp The expiration date
    *
    * @returns {Promise<{status: 'ok' | 'fail_duplicate' | 'fail_other', raw: any}>}
    */
