@@ -1,0 +1,22 @@
+{
+  "$schema": "./options.schema.json",
+  "version": "oct22_01",
+  "files": {
+    "template": "LucianBlagaHS-A4TicketSheet.png",
+    "output": {
+      "filename": "LucianBlagaHS-TICKET_SHEET",
+      "extension": "png"
+    }
+  },
+  "ticketsToGenerate": 1,
+  "ticketsPerPage": 7,
+  "ticketPostitions": [
+    { "x": 60, "y": 240, "rotation": "R" },
+    { "x": 0, "y": 0, "rotation": "R" },
+    { "x": 0, "y": 0, "rotation": "R" },
+    { "x": 0, "y": 0, "rotation": "R" },
+    { "x": 0, "y": 0, "rotation": "R" },
+    { "x": 0, "y": 0 },
+    { "x": 0, "y": 0 }
+  ]
+}

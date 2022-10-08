@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/product.schema.json",
+  "title": "Generator Options",
+  "description": "Options used when generating the tickets",
+  "type": "object",
+  "properties": {
+    "version": {
+      "description": "Options File Version Number",
+      "type": "string",
+      "enum": ["oct22_01"]
+    },
+    "files": {
+      "description": "Paths to use for the input & output files",
+      "type": "object",
+      "properties": {
+        "template": {
+          "description": "Filename/Path for the blank ticket sheet",
+          "type": "string"
+        },
+        "output": {
+          "description": "Output filename options (File will be created in the 'out' directory)",
+          "type": "object",
+          "properties": {
+            "filename": {
+              "description": "Filename (excluding generated suffix)",
+              "type": "string"
+            },
+            "extension": {
+              "description": "File extension (usually .png)",
+              "type": "string"
+            }
+          },
+          "required": ["filename", "extension"]
+        }
+      },
+      "required": ["template", "output"]
+    },
+    "ticketsToGenerate": {
+      "description": "Number of tickets to generate",
+      "type": "integer",
+      "minimum": 1
+    },
+    "ticketsPerPage": {
+      "description": "Number of tickets per page",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "ticketPostitions": {
+      "description": "Positions of the tickets (Length of array must correspond to the number of tickets per page!)",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "description": "X coordinate of the ticket",
+            "type": "integer"
+          },
+          "y": {
+            "description": "Y coordinate of the ticket",
+            "type": "integer"
+          },
+          "rotation": {
+            "description": "Rotation of the ticket",
+            "type": "string",
+            "enum": ["R", "N", "L", "I"]
+          }
+        },
+        "required": ["x", "y"]
+      }
+    }
+  },
+  "required": ["version", "files", "ticketsPerPage", "ticketPostitions"]
+}

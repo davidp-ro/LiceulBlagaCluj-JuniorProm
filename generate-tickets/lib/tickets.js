@@ -7,28 +7,47 @@ const Barcode = require("./barcode");
 
 const Tickets = {
   /**
-   * Complete generation flow (DB, barcodes, pages)
+   * Copy the template file to the file that will be populated with tickets
+   *
+   * @private
+   *
+   * @param {number} pageFileNumber Current page number
+   * @param {import('../options.json')} options Generator options
    * 
-   * @param {string} template Path to the template file
-   * @param {number} count Number of tickets to generate
-   * @param {number} maxPerPage (WIP) Number of tickets per page
+   * @returns {string} Current page file path
    */
-  async generate(template, count, maxPerPage) {
+  __copyTemplateToPageFile(pageFileNumber, options) {
+    const outFile = `out/${options.files.output.filename}_${pageFileNumber}.${options.files.output.extension}`;
+    fs.copyFileSync(options.files.template, outFile);
+    return outFile;
+  },
+
+  /**
+   * Complete generation flow (DB, barcodes, pages)
+   *
+   * @param {import('../options.json')} options Generator options
+   */
+  async generate(options) {
     const supabase = new Supabase();
+
+    let ticketCount = options.ticketsToGenerate;
     let page = 1;
     let currentPerPage = 0;
+
     if (!fs.existsSync("out")) {
       fs.mkdirSync("out");
     }
-    fs.copyFileSync(template, `out/tickets_${page}.png`);
-  
-    let initalCount = count;
-    while (count) {
-      const currentCount = initalCount - count + 1;
+    let currentPagePath = this.__copyTemplateToPageFile(page, options);
+
+    let initalCount = ticketCount;
+    while (ticketCount) {
+      const currentCount = initalCount - ticketCount + 1;
       const code = `LB22-${crypto.randomInt(100000, 999999)}`;
-  
-      console.log(`Generating ticket ${currentCount} of ${initalCount} (${code})`);
-  
+
+      console.log(
+        `Generating ticket ${currentCount} of ${initalCount} (${code})`
+      );
+
       // TODO: Uncomment this!
       // const dbRes = await supabase.addTicketToDb(
       //   code,
@@ -36,54 +55,44 @@ const Tickets = {
       //   5,
       //   "2022-10-30T12:00:00.000"
       // );
-  
+
+      // TODO: Temporary, to avoid adding data to db:
       let dbRes = {
         status: "ok",
         raw: null,
-      }
+      };
 
       if (dbRes.status === "fail_duplicate") {
         console.log("Duplicate code, retrying");
         continue;
       } else if (dbRes.status === "ok") {
-        // todo: This still needs a bit of work to get proper alignment
-        const y = (initalCount - currentPerPage + 1) * 400
-        
         await Barcode.generateTicket(
           code,
-          `out/tickets_${page}.png`,
-          110, // x coord
-          (initalCount - currentPerPage - 1) * 688 + 840, // y coord
-          // (initalCount - currentPerPage + 1) * 172, // y coord
-          "R"
-        )
+          currentPagePath,
+          options.ticketPostitions[currentPerPage].x,
+          options.ticketPostitions[currentPerPage].y,
+          // @ts-ignore - in theory safe to ignore as long as the json schema is respected
+          options.ticketPostitions[currentPerPage].rotation,
+        );
 
-        // For testing:
-        // await Barcode.generateTicket(
-        //   code,
-        //   `out/tickets_${page}.png`,
-        //   2480 / 2 - 462 / 2, // x coord
-        //   y, // y coord
-        // )
-  
         ++currentPerPage;
-        if (currentPerPage >= maxPerPage) {
+        if (currentPerPage >= options.ticketsPerPage) {
           ++page;
           currentPerPage = 0;
-          fs.copyFileSync(template, `out/tickets_${page}.png`);
+          currentPagePath = this.__copyTemplateToPageFile(page, options);
         }
-  
+
         console.log("Ok, next!");
       } else if (dbRes.status === "fail_other") {
         console.error("Failed to add to db, skipping...");
         console.log(dbRes.raw);
       }
-      
-      count--;
+
+      ticketCount--;
     }
-  
+
     Barcode.cleanup();
-  }
-}
+  },
+};
 
 module.exports = Tickets;
