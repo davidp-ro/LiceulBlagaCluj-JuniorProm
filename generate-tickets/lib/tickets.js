@@ -49,18 +49,18 @@ const Tickets = {
       );
 
       // TODO: Uncomment this!
-      // const dbRes = await supabase.addTicketToDb(
-      //   code,
-      //   "student+generic",
-      //   5,
-      //   "2022-10-30T12:00:00.000"
-      // );
+      const dbRes = await supabase.addTicketToDb(
+        code,
+        "student+generic",
+        1,
+        "2022-11-30T12:00:00.000"
+      );
 
       // TODO: Temporary, to avoid adding data to db:
-      let dbRes = {
-        status: "ok",
-        raw: null,
-      };
+      // let dbRes = {
+      //   status: "ok",
+      //   raw: null,
+      // };
 
       if (dbRes.status === "fail_duplicate") {
         console.log("Duplicate code, retrying");
