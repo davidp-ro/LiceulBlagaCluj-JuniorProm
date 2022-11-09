@@ -5,9 +5,12 @@ import type {
   QrDimensions,
 } from "html5-qrcode/core";
 
-type OnResultCallback = (resultText: string, raw: Html5QrcodeResult) => void;
-type OnErrorCallback = (errorText: string) => void;
-type OnStartedCallback = () => void;
+export type OnResultCallback = (
+  resultText: string,
+  raw: Html5QrcodeResult
+) => void;
+export type OnErrorCallback = (errorText: string) => void;
+export type OnStartedCallback = () => void;
 
 export class BarcodeReader {
   public static availableCameras: CameraDevice[] = [];
@@ -39,7 +42,7 @@ export class BarcodeReader {
     scanBox: QrDimensions,
     onResult: OnResultCallback,
     onError: OnErrorCallback,
-    onStarted: OnStartedCallback,
+    onStarted: OnStartedCallback
   ) {
     if (!this.wasInitialized) {
       alert(
@@ -62,7 +65,7 @@ export class BarcodeReader {
           onError(error);
         }
       );
-      
+
       onStarted();
     } catch (e) {
       alert(`Failed to start scanning / Eroare la pornire scanare - ${e}`);

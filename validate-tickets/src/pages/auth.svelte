@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { get } from "svelte/store";
+  import { MixpanelService } from "../lib/mixpanel";
   import { AuthAPI } from "../lib/authApi";
-  import { isAuthenticated } from "../stores";
+  import { isAuthenticated, loggedInUser } from "../stores";
 
   let form: HTMLFormElement;
   let authCode: number;
@@ -14,15 +16,25 @@
     isLoading = true;
 
     const res = await AuthAPI.validateAuthCode(authCode.toString());
-    console.log(res);
+
     if (res.isNowAuthenticated) {
       loggedIn = true;
       isLoading = false;
+      loggedInUser.set(res.responseText);
+
       setTimeout(() => {
         isAuthenticated.set(true);
-      }, 1000);
+      }, 800);
+
+      MixpanelService.event("authenticated", {
+        user: get(loggedInUser),
+      });
     } else {
-      alert(`Error / Eroare - ${res.responseText}`);
+      MixpanelService.event("error", {
+        type: "AuthError",
+        error: res.responseText,
+        user: get(loggedInUser),
+      });
     }
 
     isLoading = false;
@@ -38,9 +50,7 @@
     >
       <div class="p-6 sm:p-8">
         <div class="mb-4">
-          <h1
-            class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl"
-          >
+          <h1 class="text-xl font-bold text-gray-900 md:text-2xl">
             Verificare Bilete Balul Bobocilor
           </h1>
           <h3>Liceul Teoretic "Lucian Blaga" Cluj</h3>
@@ -49,7 +59,11 @@
         {#if isLoading}
           Autentificare...
         {:else if !loggedIn}
-          <form class="space-y-4 md:space-y-6" bind:this={form}>
+          <form
+            class="space-y-4 md:space-y-6"
+            bind:this={form}
+            on:submit|preventDefault={() => {}}
+          >
             <div>
               <label
                 for="verificationCode"
@@ -75,6 +89,7 @@
                 }}
               />
             </div>
+
             <button
               class="w-full text-white bg-ticketLightBlue focus:ring-4 focus:outline-none focus:ring-ticketLighterBlue font-medium rounded-lg text-sm px-5 py-2.5 text-center"
               type="button"
@@ -83,8 +98,13 @@
                 await authenticate();
               }}
             >
-              Sign in
+              Autentificare
             </button>
+
+            <div class="text-gray-500 text-sm mt-4">
+              Acest website foloseste cookie-uri de statistica / raportare de
+              erori!
+            </div>
           </form>
         {:else if loggedIn}
           Success!
