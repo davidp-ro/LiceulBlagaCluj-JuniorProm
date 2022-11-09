@@ -74,7 +74,7 @@
               <input
                 type="number"
                 name="verificationCode"
-                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-ticketLighterBlue focus:border-ticketLightBlue block w-full p-2.5"
+                class="lb22_verificationCodeInput bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-ticketLighterBlue focus:border-ticketLightBlue block w-full p-2.5"
                 placeholder="Introduceți codul de autentificare (6 cifre)"
                 required={true}
                 bind:value={authCode}
@@ -101,9 +101,10 @@
               Autentificare
             </button>
 
-            <div class="text-gray-500 text-sm mt-4">
-              Acest website foloseste cookie-uri de statistica / raportare de
-              erori!
+            <hr />
+            <div class="text-gray-400 text-xs">
+              Notă: Acest website folosește cookie-uri obligatorii de statistică
+              / raportare de erori!
             </div>
           </form>
         {:else if loggedIn}
@@ -113,3 +114,11 @@
     </div>
   </div>
 </section>
+
+<style>
+  .lb22_verificationCodeInput {
+    text-security: disc;
+    -webkit-text-security: disc;
+    -moz-text-security: disc;
+  }
+</style>
