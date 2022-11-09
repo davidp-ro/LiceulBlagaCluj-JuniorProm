@@ -7,6 +7,16 @@
       await BarcodeReader.init("barcodeScannerContainer");
     }, 250);
   });
+
+  const onStarted = () => {
+    const border = document.getElementById("qr-shaded-region");
+    const lines = border.childNodes;
+
+    border.style.borderColor = "red";
+    lines.forEach((element: HTMLElement) => {
+      element.style.display = 'none';
+    });
+  };
 </script>
 
 <section>
@@ -21,7 +31,8 @@
           (res, raw) => {
             alert(`Scan: ${res}`);
           },
-          (err) => {}
+          (err) => {},
+          onStarted,
         );
       }}
     >

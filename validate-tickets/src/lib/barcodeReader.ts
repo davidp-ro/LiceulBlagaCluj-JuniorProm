@@ -7,6 +7,7 @@ import type {
 
 type OnResultCallback = (resultText: string, raw: Html5QrcodeResult) => void;
 type OnErrorCallback = (errorText: string) => void;
+type OnStartedCallback = () => void;
 
 export class BarcodeReader {
   public static availableCameras: CameraDevice[] = [];
@@ -37,7 +38,8 @@ export class BarcodeReader {
     selectedCamera: CameraDevice,
     scanBox: QrDimensions,
     onResult: OnResultCallback,
-    onError: OnErrorCallback
+    onError: OnErrorCallback,
+    onStarted: OnStartedCallback,
   ) {
     if (!this.wasInitialized) {
       alert(
@@ -60,6 +62,8 @@ export class BarcodeReader {
           onError(error);
         }
       );
+      
+      onStarted();
     } catch (e) {
       alert(`Failed to start scanning / Eroare la pornire scanare - ${e}`);
     }

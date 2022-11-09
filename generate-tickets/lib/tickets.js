@@ -51,6 +51,9 @@ const Tickets = {
       // TODO: Uncomment this!
       const dbRes = await supabase.addTicketToDb(
         code,
+        // Hardcoded values for now
+        // "guest+vip",
+        // 5,
         "student+generic",
         1,
         "2022-11-30T12:00:00.000"
