@@ -15,6 +15,7 @@
   import BottomButtonContainer from "../components/scan/bottomButtonContainer.svelte";
   import SwitchCameraIcon from "../components/icons/switchCameraIcon.svelte";
   import TorchIcon from "../components/icons/torchIcon.svelte";
+  import rive from "@rive-app/canvas";
 
   let selectedOption: CameraDevice = null;
   let availableCameras: CameraDevice[] = [];
@@ -83,7 +84,7 @@
     videoElementHeight = video.offsetHeight;
     // scanHeader.style.height = `calc(100vh - ${videoElementHeight} - 1rem)`;
 
-    border.style.borderColor = "rgba(108,108,108, 30%)";
+    border.style.borderColor = "#97979761";
     border.style.borderRadius = "8px";
 
     lines.forEach((element: HTMLElement) => {
@@ -93,10 +94,26 @@
 </script>
 
 <section>
-  <div class="flex bg-gray-900" style="flex-flow: column; position: absolute; height: 100%; width: 100%">
-    <div class="notification" style="flex: 1 1">Testing</div>
-    <div class="p-4" style="flex: 0 1">
-      <div id="barcodeScannerContainer"/>
+  <div
+    class="flex bg-gray-900"
+    style="flex-flow: column; position: absolute; height: 100%; width: 100%"
+  >
+    <div class="notification flex flex-col items-center justify-center" style="flex: 1 1">
+      
+        <span class="absolute text-center text-4xl font-bold text-primary-50 tracking-wide">SCANEAZĂ<br> UN BILET</span>
+      <!-- <canvas class= "bg-red-700" id="canvas" width="81" height="55">
+        <script>
+          new rive.Rive({
+            src: "/components/animations/check.riv",
+            canvas: document.getElementById("canvas"),
+            autoplay: true,
+          });
+        </script>
+      </canvas>
+      <p>Verified</p> -->
+    </div>
+    <div class="p-4 bg-grey-500" style="flex: 0 1">
+      <div id="barcodeScannerContainer" />
     </div>
   </div>
 
@@ -120,7 +137,7 @@
       </Dropdown>
 
       <button
-        class="mx-4 text-white w-full font-semibold tracking-widest text-xl bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-xl x-4 py-2.5 inline-flex items-center justify-center"
+        class="mx-4 text-white w-full font-semibold tracking-widest text-xl  bg-black/[.55] hover: bg-black/[.75] focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-xl x-4 py-2.5 inline-flex items-center justify-center"
         type="button"
         on:click={() => {}}
       >
@@ -128,7 +145,7 @@
       </button>
 
       <button
-        class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-xl text-sm px-4 py-2.5 text-center inline-flex items-center"
+        class="text-white bg-black/[.55] hover: bg-black/[.75] focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-xl text-sm px-4 py-2.5 text-center inline-flex items-center"
         type="button"
         on:click={() => {}}
       >

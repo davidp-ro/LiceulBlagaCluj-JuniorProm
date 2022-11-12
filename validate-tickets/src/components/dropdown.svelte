@@ -9,7 +9,7 @@
 <button
   id="dropdownDefault"
   data-dropdown-toggle="dropdown"
-  class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center"
+  class="text-white  bg-black/[.55] hover: bg-black/[.75] focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center"
   type="button"
   on:focusin={() => {
     shown = true;

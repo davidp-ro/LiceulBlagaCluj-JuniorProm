@@ -26,6 +26,7 @@
     "vite": "^3.2.0"
   },
   "dependencies": {
+    "@rive-app/canvas": "^1.0.95",
     "html5-qrcode": "^2.2.8",
     "mixpanel-browser": "^2.45.0"
   }
