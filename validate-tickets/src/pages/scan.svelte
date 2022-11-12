@@ -93,10 +93,10 @@
 </script>
 
 <section>
-  <div class="flex" style="flex-flow: column; height: 100%;">
-    <div class="bg-red-700" style="flex: 1 1">Testing</div>
+  <div class="flex bg-gray-900" style="flex-flow: column; position: absolute; height: 100%; width: 100%">
+    <div class="notification" style="flex: 1 1">Testing</div>
     <div class="p-4" style="flex: 0 1">
-      <div id="barcodeScannerContainer" />
+      <div id="barcodeScannerContainer"/>
     </div>
   </div>
 
