@@ -8,7 +8,7 @@
   MixpanelService.init();
 </script>
 
-<main class="bg-gray-900 h-screen">
+<main>
   {#if $isAuthenticated}
     <Scan />
   {:else}

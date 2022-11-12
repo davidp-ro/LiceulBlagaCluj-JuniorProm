@@ -57,6 +57,7 @@ export class BarcodeReader {
         {
           fps: 60,
           qrbox: scanBox,
+          aspectRatio: 13/9,
         },
         (resultText, rawResult) => {
           onResult(resultText, rawResult);

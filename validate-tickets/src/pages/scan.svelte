@@ -12,10 +12,14 @@
   import { MixpanelService } from "../lib/mixpanel";
   import { loggedInUser } from "../stores";
   import type { CameraDevice } from "html5-qrcode/esm/core";
+  import BottomButtonContainer from "../components/scan/bottomButtonContainer.svelte";
+  import SwitchCameraIcon from "../components/icons/switchCameraIcon.svelte";
+  import TorchIcon from "../components/icons/torchIcon.svelte";
 
   let selectedOption: CameraDevice = null;
   let availableCameras: CameraDevice[] = [];
   let availableOptions: any;
+  let videoElementHeight = 0;
 
   onMount(() => {
     setTimeout(async () => {
@@ -33,8 +37,10 @@
           user: get(loggedInUser),
         });
       } else {
+        let idx = 0;
         availableOptions = availableCameras.map((c) => {
-          return { raw: c, text: c.label };
+          ++idx;
+          return { raw: c, text: `Camera ${idx}` };
         });
         console.log(availableOptions);
         selectedOption = availableOptions[0];
@@ -68,44 +74,73 @@
   };
 
   const onStarted: OnStartedCallback = () => {
+    // const scanHeader = document.getElementById("scanHeader");
     const border = document.getElementById("qr-shaded-region");
+    const video = document.getElementsByTagName("video")[0];
     const lines = border.childNodes;
 
-    border.style.borderColor = "red";
+    video.style.borderRadius = "8px";
+    videoElementHeight = video.offsetHeight;
+    // scanHeader.style.height = `calc(100vh - ${videoElementHeight} - 1rem)`;
+
+    border.style.borderColor = "rgba(108,108,108, 30%)";
+    border.style.borderRadius = "8px";
+
     lines.forEach((element: HTMLElement) => {
-      element.style.display = "none";
+      element.style.display = "";
     });
   };
 </script>
 
 <section>
-  <div id="barcodeScannerContainer" />
-
-  {#if availableCameras.length > 0}
-    <Dropdown
-      dropdownName="Camere"
-      bind:selectedOption
-      {availableOptions}
-      onChanged={() => {
-        BarcodeReader.stopScanning();
-        BarcodeReader.startScanning(
-          selectedOption,
-          { width: 300, height: 180 },
-          onResult,
-          onError,
-          onStarted
-        );
-      }}
-    />
-  {/if}
-
-  <div class="m-10">
-    <button
-      on:click|preventDefault={() => {
-        BarcodeReader.stopScanning();
-      }}
-    >
-      Stop
-    </button>
+  <div class="flex" style="flex-flow: column; height: 100%;">
+    <div class="bg-red-700" style="flex: 1 1">Testing</div>
+    <div class="p-4" style="flex: 0 1">
+      <div id="barcodeScannerContainer" />
+    </div>
   </div>
+
+  <BottomButtonContainer>
+    {#if availableCameras.length > 0}
+      <Dropdown
+        bind:selectedOption
+        {availableOptions}
+        onChanged={() => {
+          BarcodeReader.stopScanning();
+          BarcodeReader.startScanning(
+            selectedOption,
+            { width: 300, height: 180 },
+            onResult,
+            onError,
+            onStarted
+          );
+        }}
+      >
+        <SwitchCameraIcon />
+      </Dropdown>
+
+      <button
+        class="mx-4 text-white w-full font-semibold tracking-widest text-xl bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-xl x-4 py-2.5 inline-flex items-center justify-center"
+        type="button"
+        on:click={() => {}}
+      >
+        ENTER ID
+      </button>
+
+      <button
+        class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-xl text-sm px-4 py-2.5 text-center inline-flex items-center"
+        type="button"
+        on:click={() => {}}
+      >
+        <TorchIcon />
+      </button>
+    {/if}
+  </BottomButtonContainer>
 </section>
+
+<!-- <style>
+  .lb22_grid {
+    display: grid;
+    grid-template-rows: 20vh auto;
+  }
+</style> -->
