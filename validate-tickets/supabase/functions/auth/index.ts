@@ -1,25 +1,30 @@
+/**
+ * @brief Handle authentication with the auth code
+ * 
+ * @license GPL-3.0
+ * 
+ * Copyright (C) 2022 <David Pescariu, @davidp-ro>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL") ?? "",
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-);
-
-const HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS, GET, POST",
-  "Access-Control-Allow-Headers":
-    "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
-  "Content-Type": "application/json",
-  "Served-By": "supabase-edge__lb22-junior-prom",
-};
+import { supabase, okResponse, failResponse, corsResponse } from "../lib.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(JSON.stringify({ status: "ok", data: null }), {
-      headers: HEADERS,
-    });
+    return corsResponse();
   }
 
   const { authCode } = await req.json();
@@ -30,26 +35,10 @@ serve(async (req) => {
     .eq("auth_code", authCode);
 
   if (error || !data || data.length == 0) {
-    return new Response(
-      JSON.stringify({
-        status: "fail",
-        data: error?.message ?? "Something went wrong",
-      }),
-      {
-        status: 500,
-        headers: HEADERS,
-      }
+    return failResponse(
+      error?.message ?? "Invalid auth code / Cod de autentificare invalid"
     );
   }
 
-  return new Response(
-    JSON.stringify({
-      status: "ok",
-      data: data[0].id ?? "Authenticated",
-    }),
-    {
-      status: 200,
-      headers: HEADERS,
-    }
-  );
+  return okResponse(data[0].id ?? "Authenticated");
 });
