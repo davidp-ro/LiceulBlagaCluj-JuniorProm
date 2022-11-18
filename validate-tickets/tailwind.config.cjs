@@ -7,7 +7,7 @@ const config = {
                 primary: {
                     50: "#eff6ff",
                     100: "#dbeafe",
-                    200: "#bfdbfe",
+                    200: "#D7EEF2",
                     300: "#93c5fd",
                     400: "#60a5fa",
                     500: "#3b82f6",
@@ -26,6 +26,9 @@ const config = {
                     300: "#a2a2a3",
                     200: "#b9b9ba",
                     100: "#d0d0d1",
+                },
+                red: {
+                    200: "#F2D7D7",
                 },
             },
         },

@@ -60,7 +60,7 @@
 
       // Rive:
       const layout = new Layout({
-        fit: Fit.ScaleDown,
+        fit: Fit.Fill,
         alignment: Alignment.CenterLeft,
       });
 
@@ -161,19 +161,88 @@
       {/if}
 
       <div
-        class={hasScannedTicket ? "grid" : "hidden"}
-        style="grid-template-columns: 35vw 65vw;"
+        class="{hasScannedTicket
+          ? 'grid'
+          : 'hidden'} items-center justify-start, gap-4"
+        style="grid-template-columns: auto auto;"
       >
-        <canvas id="riveCanvas" />
-        <div class="text-white">
+        <canvas class="h-20 aspect-square" id="riveCanvas" />
+        <div class="flex flex-row  items-end justify-around  gap-6">
           {#if scannedTicketResponse}
             {#if scannedTicketResponse.isValid}
-              Valid - {scannedTicketResponse.ticket.entries_remaining}
+              <div
+                class="text-primary-200 text-3xl font-semibold tracking-wider"
+              >
+                VERIFICAT
+              </div>
+              <div class="text-primary-200 text-base font-medium">
+                {scannedTicketResponse.ticket
+                  .entries_remaining}/{scannedTicketResponse.ticket
+                  .ticket_type == "student+generic"
+                  ? "1"
+                  : "5"} LEFT
+              </div>
             {:else}
-              Invalid
+              <div class="text-red-200 text-3xl font-semibold tracking-wider">
+                INVALID
+              </div>
             {/if}
           {/if}
         </div>
+      </div>
+
+      <div>
+        {#if scannedTicketResponse}
+          {#if scannedTicketResponse.isValid}
+            <div class="flex flex-row gap-2 items-center ml-10">
+              <div
+                class="text-primary-200 text-xl font-semibold tracking-wider"
+              >
+                ID:
+              </div>
+              <div class="text-primary-200 text-lg font-medium tracking-wider">
+                {scannedTicketResponse.ticket.code}
+              </div>
+            </div>
+            <div class="flex flex-row gap-2 items-center ml-10">
+              <div
+                class="text-primary-200 text-xl font-semibold tracking-wider"
+              >
+                TIP:
+              </div>
+              <div class="text-primary-200 text-lg font-medium tracking-wider">
+                {scannedTicketResponse.ticket.ticket_type == "student+generic"
+                  ? "ELEV"
+                  : "VIP"}
+              </div>
+            </div>
+          {:else}
+            <div class="flex flex-row gap-2 items-center ml-10">
+              <div
+                class="text-primary-200 text-xl font-semibold tracking-wider font-['Flow_Block']"
+              >
+                ID:
+              </div>
+              <div
+                class="text-primary-200 text-xl font-semibold tracking-wider font-['Flow_Block']"
+              >
+                LT22-123456
+              </div>
+            </div>
+            <div class="flex flex-row gap-2 items-center ml-10">
+              <div
+                class="text-primary-200 text-xl font-semibold tracking-wider font-['Flow_Block']"
+              >
+                TIP:
+              </div>
+              <div
+                class="text-primary-200 text-xl font-semibold tracking-wider font-['Flow_Block']"
+              >
+                NOTIN
+              </div>
+            </div>
+          {/if}
+        {/if}
       </div>
     </div>
     <div class="p-4 bg-grey-500" style="flex: 0 1">
