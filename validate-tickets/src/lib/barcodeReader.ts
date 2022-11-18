@@ -14,6 +14,7 @@ export type OnStartedCallback = () => void;
 
 export class BarcodeReader {
   public static availableCameras: CameraDevice[] = [];
+  public static isFlashOn = false;
   private static wasInitialized = false;
   private static instance: Html5Qrcode;
 
@@ -37,6 +38,42 @@ export class BarcodeReader {
     }
   }
 
+  static async toggleFlash() {
+    let ok = false;
+
+    if (this.isFlashOn) {
+      ok = await this.flashOff();
+    } else {
+      ok = await this.flashOn();
+    }
+
+    if (ok) {
+      this.isFlashOn = !this.isFlashOn;
+    } else {
+      alert("Failed to toggle flash / Eroare la comutare flash");
+    }
+  }
+
+  private static async flashOn(): Promise<boolean> {
+    try {
+      // @ts-ignore
+      await this.instance.applyVideoConstraints({ advanced: [{ torch: true }] })
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  private static async flashOff(): Promise<boolean> {
+    try {
+      // @ts-ignore
+      await this.instance.applyVideoConstraints({ advanced: [{ torch: false }] })
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static async startScanning(
     selectedCamera: CameraDevice,
     scanBox: QrDimensions,
@@ -57,7 +94,7 @@ export class BarcodeReader {
         {
           fps: 60,
           qrbox: scanBox,
-          aspectRatio: 13/9,
+          aspectRatio: 13 / 9,
         },
         (resultText, rawResult) => {
           onResult(resultText, rawResult);

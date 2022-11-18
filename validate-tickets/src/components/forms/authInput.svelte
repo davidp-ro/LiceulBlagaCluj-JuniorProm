@@ -12,7 +12,7 @@
   <input
     type="number"
     name="verificationCode"
-    class="lb22_verificationCodeInput text-sm border dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800 text-white sm:text-sm rounded-lg focus:ring-ticketLighterBlue focus:border-ticketLightBlue block w-full p-2.5"
+    class="lb22_verificationCodeInput text-sm border bg-gray-700 border-gray-600 focus:ring-primary-600 ring-offset-gray-800 text-white sm:text-sm rounded-lg focus:ring-ticketLighterBlue focus:border-ticketLightBlue block w-full p-2.5"
     placeholder="Introduceți codul de autentificare (6 cifre)"
     required={true}
     bind:value={authCode}

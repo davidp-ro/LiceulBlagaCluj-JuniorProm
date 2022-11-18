@@ -4,8 +4,8 @@
   import { AuthAPI } from "../lib/authApi";
   import { isAuthenticated, loggedInUser } from "../stores";
 
-  import AuthCard from "../components/auth/authCard.svelte";
-  import AuthInput from "../components/auth/authInput.svelte";
+  import AuthCard from "../components/forms/authCard.svelte";
+  import AuthInput from "../components/forms/authInput.svelte";
 
   let _form: HTMLFormElement;
   let authCode: number;
