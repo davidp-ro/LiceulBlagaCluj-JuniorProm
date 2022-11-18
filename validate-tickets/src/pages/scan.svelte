@@ -2,6 +2,13 @@
   import { get } from "svelte/store";
   import { onMount } from "svelte";
   import { loggedInUser } from "../stores";
+  import {
+    Alignment,
+    Fit,
+    Layout,
+    Rive,
+    StateMachineInput,
+  } from "@rive-app/canvas";
 
   import type { CameraDevice } from "html5-qrcode/esm/core";
   import {
@@ -15,12 +22,17 @@
   import BottomButtonContainer from "../components/scan/bottomButtonContainer.svelte";
   import SwitchCameraIcon from "../components/icons/switchCameraIcon.svelte";
   import TorchIcon from "../components/icons/torchIcon.svelte";
-  import { ValidateAPI } from "../lib/validateApi";
+  import { ValidateAPI, type ValidateApiResponse } from "../lib/validateApi";
 
   let selectedOption: CameraDevice = null;
   let availableCameras: CameraDevice[] = [];
   let availableOptions: any;
   let lastScannedCode: string = "none";
+  let hasScannedTicket = false;
+  let scannedTicketResponse: ValidateApiResponse = null;
+
+  let riveVerifiedTrigger: StateMachineInput;
+  let riveFailedTrigger: StateMachineInput;
 
   onMount(() => {
     setTimeout(async () => {
@@ -45,15 +57,41 @@
         });
         selectedOption = availableOptions[0];
       }
+
+      // Rive:
+      const layout = new Layout({
+        fit: Fit.ScaleDown,
+        alignment: Alignment.CenterLeft,
+      });
+
+      const rive = new Rive({
+        layout,
+        src: "/animations/scan.riv",
+        canvas: document.getElementById("riveCanvas"),
+        autoplay: true,
+        stateMachines: "machine",
+        onLoad: (_) => {
+          const inputs = rive.stateMachineInputs("machine");
+          riveVerifiedTrigger = inputs.find((i) => i.name === "verified");
+          riveFailedTrigger = inputs.find((i) => i.name === "failed_verified");
+        },
+      });
     }, 50);
   });
+
+  const hideAnimation = () => {
+    setTimeout(() => {
+      hasScannedTicket = false;
+    }, 750);
+  };
 
   const onResult: OnResultCallback = async (text, _) => {
     if (text == lastScannedCode) {
       return;
     }
     lastScannedCode = text;
-    
+    hasScannedTicket = true;
+
     if (text.length !== 11 || !text.startsWith("LB22-")) {
       MixpanelService.event("error", {
         type: "SoftError_UnknownResult",
@@ -63,8 +101,21 @@
       return;
     }
 
-    const res = await ValidateAPI.validateTicket(text);
-    alert(JSON.stringify(res));
+    scannedTicketResponse = await ValidateAPI.validateTicket(text);
+
+    if (scannedTicketResponse.isValid) {
+      riveVerifiedTrigger.fire();
+      setTimeout(() => {
+        riveVerifiedTrigger.fire();
+        hideAnimation();
+      }, 5000);
+    } else {
+      riveFailedTrigger.fire();
+      setTimeout(() => {
+        riveFailedTrigger.fire();
+        hideAnimation();
+      }, 5000);
+    }
 
     MixpanelService.event("scan", {
       code: text,
@@ -96,23 +147,34 @@
     style="flex-flow: column; position: absolute; height: 100%; width: 100%"
   >
     <div
-      class="notification flex flex-col items-center justify-center"
+      class="notification flex flex-col {hasScannedTicket
+        ? 'items-start justify-start'
+        : 'items-center justify-center'}"
       style="flex: 1 1"
     >
-      <span
-        class="absolute text-center text-4xl font-bold text-primary-50 tracking-wide"
-        >SCANEAZĂ<br /> UN BILET</span
+      {#if !hasScannedTicket}
+        <span
+          class="absolute text-center text-4xl font-bold text-primary-50 tracking-wide"
+        >
+          SCANEAZĂ<br /> UN BILET
+        </span>
+      {/if}
+
+      <div
+        class={hasScannedTicket ? "grid" : "hidden"}
+        style="grid-template-columns: 35vw 65vw;"
       >
-      <!-- <canvas class= "bg-red-700" id="canvas" width="81" height="55">
-        <script>
-          new rive.Rive({
-            src: "/components/animations/check.riv",
-            canvas: document.getElementById("canvas"),
-            autoplay: true,
-          });
-        </script>
-      </canvas>
-      <p>Verified</p> -->
+        <canvas id="riveCanvas" />
+        <div class="text-white">
+          {#if scannedTicketResponse}
+            {#if scannedTicketResponse.isValid}
+              Valid - {scannedTicketResponse.ticket.entries_remaining}
+            {:else}
+              Invalid
+            {/if}
+          {/if}
+        </div>
+      </div>
     </div>
     <div class="p-4 bg-grey-500" style="flex: 0 1">
       <div id="barcodeScannerContainer" />
@@ -156,10 +218,3 @@
     {/if}
   </BottomButtonContainer>
 </section>
-
-<!-- <style>
-  .lb22_grid {
-    display: grid;
-    grid-template-rows: 20vh auto;
-  }
-</style> -->

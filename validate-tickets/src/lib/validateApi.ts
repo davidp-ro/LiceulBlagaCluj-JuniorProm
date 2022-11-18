@@ -41,7 +41,7 @@ export class ValidateAPI {
     if (json.status === "fail") {
       return { isValid: false, error: json.data };
     } else {
-      return { isValid: true, ticket: json.data };
+      return { isValid: true, ticket: json.data[0] };
     }
   }
 }
