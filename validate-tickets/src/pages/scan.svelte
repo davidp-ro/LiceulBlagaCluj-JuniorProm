@@ -213,7 +213,9 @@
       <button
         class="text-white bg-black/[.55] hover: bg-black/[.75] focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-xl text-sm px-4 py-2.5 text-center inline-flex items-center"
         type="button"
-        on:click={() => {}}
+        on:click={async () => {
+          await BarcodeReader.toggleFlash();
+        }}
       >
         <TorchIcon />
       </button>
