@@ -1,7 +1,7 @@
 <script lang="ts">
   import { get } from "svelte/store";
   import { onMount } from "svelte";
-  import { loggedInUser } from "../stores";
+  import { currentPage, loggedInUser } from "../stores";
   import {
     Alignment,
     Fit,
@@ -203,7 +203,9 @@
       <button
         class="mx-4 text-white w-full font-semibold tracking-widest text-xl  bg-black/[.55] hover: bg-black/[.75] focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-xl x-4 py-2.5 inline-flex items-center justify-center"
         type="button"
-        on:click={() => {}}
+        on:click={() => {
+          currentPage.set("enterCode");
+        }}
       >
         ENTER ID
       </button>
