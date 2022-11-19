@@ -4,6 +4,7 @@
   import { currentPage, loggedInUser } from "../stores";
   import {
     Alignment,
+    EventType,
     Fit,
     Layout,
     Rive,
@@ -31,6 +32,7 @@
   let hasScannedTicket = false;
   let scannedTicketResponse: ValidateApiResponse = null;
 
+  let rive: Rive;
   let riveVerifiedTrigger: StateMachineInput;
   let riveFailedTrigger: StateMachineInput;
 
@@ -64,7 +66,7 @@
         alignment: Alignment.CenterLeft,
       });
 
-      const rive = new Rive({
+      rive = new Rive({
         layout,
         src: "/animations/scan.riv",
         canvas: document.getElementById("riveCanvas"),
@@ -79,10 +81,26 @@
     }, 50);
   });
 
-  const hideAnimation = () => {
-    setTimeout(() => {
-      hasScannedTicket = false;
-    }, 750);
+  const hideAnimation = (force = false) => {
+    if (force) {
+      if (scannedTicketResponse.isValid) {
+        riveVerifiedTrigger.fire();
+        hideAnimation();
+      } else {
+        riveFailedTrigger.fire();
+        hideAnimation();
+      }
+
+      return;
+    }
+
+    rive.on(EventType.StateChange, (e) => {
+      if (e.data == "closed") {
+        scannedTicketResponse = null;
+        hasScannedTicket = false;
+        BarcodeReader.resume();
+      }
+    });
   };
 
   const onResult: OnResultCallback = async (text, _) => {
@@ -90,7 +108,6 @@
       return;
     }
     lastScannedCode = text;
-    hasScannedTicket = true;
 
     if (text.length !== 11 || !text.startsWith("LB22-")) {
       MixpanelService.event("error", {
@@ -101,6 +118,8 @@
       return;
     }
 
+    hasScannedTicket = true;
+    BarcodeReader.pause();
     scannedTicketResponse = await ValidateAPI.validateTicket(text);
 
     if (scannedTicketResponse.isValid) {
@@ -108,13 +127,13 @@
       setTimeout(() => {
         riveVerifiedTrigger.fire();
         hideAnimation();
-      }, 5000);
+      }, 3000);
     } else {
       riveFailedTrigger.fire();
       setTimeout(() => {
         riveFailedTrigger.fire();
         hideAnimation();
-      }, 5000);
+      }, 3000);
     }
 
     MixpanelService.event("scan", {
@@ -191,9 +210,7 @@
         </div>
       </div>
 
-      <div class = {hasScannedTicket
-          ? 'grid'
-          : 'hidden'}>
+      <div class={hasScannedTicket ? "grid" : "hidden"}>
         {#if scannedTicketResponse}
           {#if scannedTicketResponse.isValid}
             <div class="flex flex-row gap-2 items-center ml-10">
@@ -223,27 +240,37 @@
               <div
                 class="text-primary-200 text-xl font-semibold tracking-wider font-['Flow_Block']"
               >
-                ID:
+                ---
               </div>
               <div
                 class="text-primary-200 text-xl font-semibold tracking-wider font-['Flow_Block']"
               >
-                LT22-123456
+                ____-______
               </div>
             </div>
             <div class="flex flex-row gap-2 items-center ml-10">
               <div
                 class="text-primary-200 text-xl font-semibold tracking-wider font-['Flow_Block']"
               >
-                TIP:
+                ----
               </div>
               <div
                 class="text-primary-200 text-xl font-semibold tracking-wider font-['Flow_Block']"
               >
-                NOTIN
+                -------
               </div>
             </div>
           {/if}
+
+          <button
+            class="mt-3 ml-8 text-white text-sm bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-xl px-4 py-2.5"
+            type="button"
+            on:click={() => {
+              hideAnimation(true);
+            }}
+          >
+            Ok, scanzează alt bilet
+          </button>
         {/if}
       </div>
     </div>
@@ -274,7 +301,8 @@
       <button
         class="mx-4 text-white w-full font-semibold tracking-widest text-xl  bg-black/[.55] hover: bg-black/[.75] focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-xl x-4 py-2.5 inline-flex items-center justify-center"
         type="button"
-        on:click={() => {
+        on:click={async () => {
+          await BarcodeReader.stopScanning();
           currentPage.set("enterCode");
         }}
       >

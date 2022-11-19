@@ -1,4 +1,4 @@
-import { Html5Qrcode } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeScannerState } from "html5-qrcode";
 import type {
   CameraDevice,
   Html5QrcodeResult,
@@ -72,6 +72,18 @@ export class BarcodeReader {
     } catch (e) {
       return false;
     }
+  }
+
+  static async pause(shouldPauseVideo = false) {
+    try {
+      this.instance.pause(shouldPauseVideo);
+    } catch(_) {}
+  }
+
+  static async resume() {
+    try {
+      this.instance.resume();
+    } catch(_) {}
   }
 
   static async startScanning(
