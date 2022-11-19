@@ -191,7 +191,9 @@
         </div>
       </div>
 
-      <div>
+      <div class = {hasScannedTicket
+          ? 'grid'
+          : 'hidden'}>
         {#if scannedTicketResponse}
           {#if scannedTicketResponse.isValid}
             <div class="flex flex-row gap-2 items-center ml-10">
